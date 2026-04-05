@@ -2,6 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Lock, Mail, Activity, Key } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function Login({ setToken }) {
   const [mode, setMode] = useState('login'); // login | register | forgot | reset
   const [email, setEmail] = useState('');
@@ -18,13 +20,13 @@ export default function Login({ setToken }) {
     try {
       if (mode === 'login' || mode === 'register') {
         const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
-        const res = await axios.post(`http://localhost:5000${endpoint}`, { email, password });
+        const res = await axios.post(`${API_URL}${endpoint}`, { email, password });
         const token = res.data.token;
         localStorage.setItem('auth_token', token);
         setToken(token);
       } else if (mode === 'forgot') {
         // Request a reset token
-        const res = await axios.post(`http://localhost:5000/api/auth/forgotpassword`, { email });
+        const res = await axios.post(`${API_URL}/api/auth/forgotpassword`, { email });
         // Since we aren't using email yet, grab it directly from response for the UI Demo
         const generatedToken = res.data.data;
         setMessage('Reset link generated! Moving to reset phase in 3s...');
@@ -35,7 +37,7 @@ export default function Login({ setToken }) {
           setMessage('');
         }, 3000);
       } else if (mode === 'reset') {
-        const res = await axios.put(`http://localhost:5000/api/auth/resetpassword/${resetToken}`, { password });
+        const res = await axios.put(`${API_URL}/api/auth/resetpassword/${resetToken}`, { password });
         const token = res.data.token;
         localStorage.setItem('auth_token', token);
         setToken(token);

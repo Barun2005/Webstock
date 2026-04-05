@@ -10,7 +10,8 @@ import { Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend);
 
-const SOCKET_URL = 'http://localhost:5000';
+// Dynamically use the live Render URL if deployed, or localhost if running on your computer!
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
