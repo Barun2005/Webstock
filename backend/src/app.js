@@ -5,9 +5,27 @@ const morgan = require('morgan');
 
 const app = express();
 
+// Allowed origins: local dev + live Vercel frontend
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://webstock-lime.vercel.app',
+  /\.vercel\.app$/ // Also allow any future Vercel preview deployments
+];
+
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS for React frontend
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like curl, Postman, or mobile apps)
+    if (!origin) return callback(null, true);
+    const allowed = allowedOrigins.some(o =>
+      typeof o === 'string' ? o === origin : o.test(origin)
+    );
+    if (allowed) return callback(null, true);
+    return callback(new Error(`CORS policy blocked: ${origin}`));
+  },
+  credentials: true
+}));
 app.use(express.json()); // Parse JSON bodies
 app.use(morgan('dev')); // HTTP request logger
 
